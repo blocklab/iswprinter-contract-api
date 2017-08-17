@@ -1,0 +1,3 @@
+# Run project
+
+    ./run.sh
