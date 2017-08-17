@@ -1,3 +1,7 @@
+# Init project
+
+    ./init.sh && mvn package
+
 # Run project
 
     ./run.sh
