@@ -1,0 +1,3 @@
+[submodule "smart_contract"]
+	path = smart_contract
+	url = https://github.com/blocklab/iswprinter-contract.git
