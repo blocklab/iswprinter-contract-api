@@ -2,6 +2,7 @@ package co.hodler;
 
 import co.hodler.boundaries.DeployPrinter;
 import co.hodler.boundaries.Printer;
+import co.hodler.model.PrintableId;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.json.JSONArray;
@@ -53,9 +54,9 @@ public class PrinterIntegrationTest {
   }
 
   @Test
-  public void be_able_to_buy_a_print_job() throws Exception {
-    Bytes32 firstDeliverableHash = new Bytes32(hexStringToByteArray(web3.web3Sha3
-      ("some-gcode").send().getResult().replace("0x", "")));
+  public void is_able_to_buy_a_print_job() throws Exception {
+    Bytes32 firstDeliverableHash = new Bytes32(new PrintableId(web3.web3Sha3
+      ("some-gcode").send().getResult()).asByteArray());
     Address usersAddress = new Address(credentials.getAddress());
 
     printer.buyRightToPrintOnce(firstDeliverableHash, BigInteger.valueOf(10000))
@@ -64,6 +65,19 @@ public class PrinterIntegrationTest {
     BigInteger result = printer.timesUserIsAllowedToPrint
       (firstDeliverableHash, usersAddress).get().getValue();
     assertThat(result, is(BigInteger.valueOf(1)));
+  }
+
+  @Test
+  public void is_able_to_reset_print_amount() throws Exception {
+    Bytes32 firstDeliverableHash = new Bytes32(new PrintableId(web3.web3Sha3
+      ("some-gcode").send().getResult()).asByteArray());
+    Address usersAddress = new Address(credentials.getAddress());
+
+    printer.resetPrints(firstDeliverableHash, usersAddress).get();
+
+    BigInteger result = printer.timesUserIsAllowedToPrint
+      (firstDeliverableHash, usersAddress).get().getValue();
+    assertThat(result, is(BigInteger.valueOf(0)));
   }
 
   private static Credentials generateSampleWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
@@ -97,13 +111,5 @@ public class PrinterIntegrationTest {
     return (String) ethAccounts.getArray().get(0);
   }
 
-  private byte[] hexStringToByteArray(String s) {
-    int len = s.length();
-    byte[] data = new byte[len / 2];
-    for (int i = 0; i < len; i += 2) {
-      data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-        + Character.digit(s.charAt(i+1), 16));
-    }
-    return data;
-  }
+
 }
