@@ -1,3 +1,5 @@
 .idea
 target/
 dependency-reduced-pom.xml
+compiled_contract/
+wallets/
