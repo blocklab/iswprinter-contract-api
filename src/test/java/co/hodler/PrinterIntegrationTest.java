@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.crypto.Credentials;
@@ -28,7 +29,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = {"contractAddress=foo"})
+@TestPropertySource(locations="classpath:test.properties")
+@SpringBootTest
 public class PrinterIntegrationTest {
   private static String BLOCKCHAIN_URL = "http://localhost:8545";
   private static Credentials credentials;
