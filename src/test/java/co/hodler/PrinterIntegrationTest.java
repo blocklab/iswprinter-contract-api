@@ -18,12 +18,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.crypto.Credentials;
-import org.web3j.crypto.WalletUtils;
 
-import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,7 +35,6 @@ public class PrinterIntegrationTest {
   private static Process testRpcProcess;
   private String contractAddress;
   private boolean initialized = false;
-  private static Path testWallet = Paths.get("testwallet");
 
   @Autowired
   EthereumService ethereumService;
@@ -48,6 +44,8 @@ public class PrinterIntegrationTest {
   PrinterContract contract;
   @Autowired
   TestRestTemplate restTemplate;
+  @Autowired
+  CredentialsService credentialsService;
 
 
   DefaultPrinterService printerService;
@@ -58,7 +56,7 @@ public class PrinterIntegrationTest {
     if (!initialized) {
       testRpcProcess = new ProcessBuilder("testrpc").start();
       Thread.sleep(2000);
-      credentials = loadSampleWallet();
+      credentials = credentialsService.loadCredentials();
 
       send100EtherToWeb3CreatedAccount(credentials, extractFirstAccount());
 
@@ -77,7 +75,7 @@ public class PrinterIntegrationTest {
   @AfterClass
   public static void kill_testrpc() throws Exception {
     testRpcProcess.destroy();
-    Files.delete(testWallet);
+    Files.delete(Paths.get("wallet.tmp"));
   }
 
   @Test
@@ -115,15 +113,9 @@ public class PrinterIntegrationTest {
     assertThat(result, is(BigInteger.valueOf(0)));
   }
 
-  private Credentials loadSampleWallet() throws Exception {
-    Files.write(testWallet, configuration.walletSource.getBytes());
-    return WalletUtils.loadCredentials(configuration.walletPassword, new File
-      ("testwallet"));
-  }
-
   private void send100EtherToWeb3CreatedAccount(Credentials
-                                                         credentials, String
-                                                         firstAccount) throws
+                                                  credentials, String
+                                                  firstAccount) throws
     Exception {
     JSONObject sendTxRpcPayload = new JSONObject();
     sendTxRpcPayload.put("jsonrpc", "2.0");
