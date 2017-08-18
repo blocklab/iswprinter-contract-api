@@ -21,6 +21,8 @@ import org.web3j.crypto.WalletUtils;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -47,7 +49,7 @@ public class PrinterIntegrationTest {
   public static void initialize_contract() throws Exception {
     testRpcProcess = new ProcessBuilder("testrpc").start();
     Thread.sleep(2000);
-    credentials = generateSampleWallet();
+    credentials = loadSampleWallet();
 
     send100EtherToWeb3CreatedAccount(credentials, extractFirstAccount());
 
@@ -77,8 +79,8 @@ public class PrinterIntegrationTest {
 
     contract.get(credentials).buyRightToPrintOnce(firstDeliverableHash,
       BigInteger
-      .valueOf
-        (10000))
+        .valueOf
+          (10000))
       .get();
 
     UserId userId = new UserId(credentials.getAddress());
@@ -98,11 +100,19 @@ public class PrinterIntegrationTest {
     assertThat(result, is(BigInteger.valueOf(0)));
   }
 
-  private static Credentials generateSampleWallet() throws Exception {
-    new File("wallets").mkdir();
-    String fileName = WalletUtils.generateLightNewWalletFile("axel", new File
-      ("wallets"));
-    return WalletUtils.loadCredentials("axel", "wallets/" + fileName);
+  private static Credentials loadSampleWallet() throws Exception {
+    String walletSource = "{\"address" +
+      "\":\"5af5e232602cf74af474fb4ee4c5e10fb7a32dd4\"," +
+      "\"id\":\"8d3062b3-2199-497d-979a-49532a5c6ffc\",\"version\":3," +
+      "\"crypto\":{\"cipher\":\"aes-128-ctr\"," +
+      "\"ciphertext" +
+      "\":\"58de26382989f72e0250592a4779caa49459f3062fc9f59f985507e869b6b721" +
+      "\",\"cipherparams\":{\"iv\":\"fc24d969fd7b07e7a7ecdb7b4952bc2d\"}," +
+      "\"kdf\":\"scrypt\",\"kdfparams\":{\"dklen\":32,\"n\":4096,\"p\":6," +
+      "\"r\":8," +
+      "\"salt\":\"534a9abda97ffae24a2052226ec044507e966402d54c9c90e10b572b28b66f5b\"},\"mac\":\"4c6477786acc078bdb63b450f4c956346c3450b555532b9a855f98e322329b19\"}}";
+    Files.write(Paths.get("testwallet"), walletSource.getBytes());
+    return WalletUtils.loadCredentials("axel", new File("testwallet"));
   }
 
   private static void send100EtherToWeb3CreatedAccount(Credentials
