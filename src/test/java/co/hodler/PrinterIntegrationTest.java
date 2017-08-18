@@ -16,16 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.abi.datatypes.generated.Bytes32;
-import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -103,9 +98,7 @@ public class PrinterIntegrationTest {
     assertThat(result, is(BigInteger.valueOf(0)));
   }
 
-  private static Credentials generateSampleWallet() throws
-    NoSuchAlgorithmException, NoSuchProviderException,
-    InvalidAlgorithmParameterException, CipherException, IOException {
+  private static Credentials generateSampleWallet() throws Exception {
     new File("wallets").mkdir();
     String fileName = WalletUtils.generateLightNewWalletFile("axel", new File
       ("wallets"));
