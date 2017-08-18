@@ -1,33 +1,26 @@
 package co.hodler.boundaries;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 
 import java.math.BigInteger;
 
 public class DeployPrinter {
-  private Web3j web3j;
 
-  public DeployPrinter(Web3j web3j) {
-    this.web3j = web3j;
+  private final EthereumService ethereumService;
+
+  @Autowired
+  public DeployPrinter(EthereumService ethereumService) {
+    this.ethereumService = ethereumService;
   }
 
   public Printer deployWith(Credentials credentials) throws Exception {
-    BigInteger initialEther = BigInteger.valueOf(0);
-    BigInteger gasPrice = web3j.ethGasPrice().send().getGasPrice();
-    BigInteger gasLimit = web3j.ethGetBlockByNumber(latestBlock(), true)
-      .send().getResult().getGasLimit();
-    return Printer.deploy(web3j, credentials, gasPrice, gasLimit, initialEther)
+    return Printer.deploy(ethereumService.getWeb3(), credentials,
+      ethereumService.currentGasPrice(),
+      ethereumService.currentGasLimit(),
+      BigInteger
+        .valueOf(0))
       .get();
   }
 
-  private DefaultBlockParameter latestBlock() {
-    return new DefaultBlockParameter() {
-      @Override
-      public String getValue() {
-        return "latest";
-      }
-    };
-  }
 }

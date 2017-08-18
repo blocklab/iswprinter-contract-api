@@ -1,9 +1,6 @@
 package co.hodler;
 
-import co.hodler.boundaries.DefaultPrinterService;
-import co.hodler.boundaries.DeployPrinter;
-import co.hodler.boundaries.EthereumService;
-import co.hodler.boundaries.Printer;
+import co.hodler.boundaries.*;
 import co.hodler.model.PrintableId;
 import co.hodler.model.UserId;
 import com.mashape.unirest.http.JsonNode;
@@ -59,7 +56,7 @@ public class PrinterIntegrationTest {
     send100EtherToWeb3CreatedAccount(credentials, extractFirstAccount());
 
     web3 = Web3j.build(new HttpService());
-    DeployPrinter deployPrinter = new DeployPrinter(web3);
+    DeployPrinter deployPrinter = new DeployPrinter(new DefaultEthereumService());
     printer = deployPrinter.deployWith(credentials);
     printableId = new PrintableId("some-gcode");
   }
