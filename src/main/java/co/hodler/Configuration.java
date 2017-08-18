@@ -7,4 +7,6 @@ import org.springframework.stereotype.Component;
 public class Configuration {
   @Value("${contractAddress}")
   public String contractAddress;
+  @Value("${walletSource}")
+  public String walletSource;
 }
