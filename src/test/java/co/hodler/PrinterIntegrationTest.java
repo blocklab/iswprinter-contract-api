@@ -106,7 +106,8 @@ public class PrinterIntegrationTest {
 
   private Credentials loadSampleWallet() throws Exception {
     Files.write(testWallet, configuration.walletSource.getBytes());
-    return WalletUtils.loadCredentials("axel", new File("testwallet"));
+    return WalletUtils.loadCredentials(configuration.walletPassword, new File
+      ("testwallet"));
   }
 
   private void send100EtherToWeb3CreatedAccount(Credentials

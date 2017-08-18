@@ -9,4 +9,6 @@ public class Configuration {
   public String contractAddress;
   @Value("${walletSource}")
   public String walletSource;
+  @Value("${walletPassword}")
+  public String walletPassword;
 }
