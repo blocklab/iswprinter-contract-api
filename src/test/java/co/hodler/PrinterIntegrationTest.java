@@ -2,6 +2,7 @@ package co.hodler;
 
 import co.hodler.boundaries.DefaultPrinterService;
 import co.hodler.boundaries.DeployPrinter;
+import co.hodler.boundaries.EthereumService;
 import co.hodler.boundaries.Printer;
 import co.hodler.model.PrintableId;
 import co.hodler.model.UserId;
@@ -13,6 +14,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -30,12 +35,17 @@ import java.security.NoSuchProviderException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PrinterIntegrationTest {
   private static String BLOCKCHAIN_URL = "http://localhost:8545";
   private static Credentials credentials;
   private static Web3j web3;
   private static Printer printer;
   private static Process testRpcProcess;
+
+  @Autowired
+  EthereumService ethereumService;
 
   DefaultPrinterService printerService;
   private static PrintableId printableId;
@@ -51,13 +61,12 @@ public class PrinterIntegrationTest {
     web3 = Web3j.build(new HttpService());
     DeployPrinter deployPrinter = new DeployPrinter(web3);
     printer = deployPrinter.deployWith(credentials);
-    printableId = new PrintableId(web3.web3Sha3
-      ("some-gcode").send().getResult());
+    printableId = new PrintableId("some-gcode");
   }
 
   @Before
   public void initialize() throws Exception {
-    printerService = new DefaultPrinterService(printer);
+    printerService = new DefaultPrinterService(printer, ethereumService);
   }
 
   @AfterClass
@@ -67,7 +76,7 @@ public class PrinterIntegrationTest {
 
   @Test
   public void is_able_to_buy_a_print_job() throws Exception {
-    Bytes32 firstDeliverableHash = new Bytes32(printableId.asByteArray());
+    Bytes32 firstDeliverableHash = ethereumService.keccak256(printableId.asString());
 
     printer.buyRightToPrintOnce(firstDeliverableHash, BigInteger.valueOf(10000))
       .get();
