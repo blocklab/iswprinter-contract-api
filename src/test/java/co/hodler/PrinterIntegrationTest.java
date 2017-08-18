@@ -22,6 +22,7 @@ import org.web3j.crypto.WalletUtils;
 import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,6 +37,7 @@ public class PrinterIntegrationTest {
   private static Process testRpcProcess;
   private String contractAddress;
   private boolean initialized = false;
+  private static Path testWallet = Paths.get("testwallet");
 
   @Autowired
   EthereumService ethereumService;
@@ -69,8 +71,9 @@ public class PrinterIntegrationTest {
   }
 
   @AfterClass
-  public static void kill_testrpc() {
+  public static void kill_testrpc() throws Exception {
     testRpcProcess.destroy();
+    Files.delete(testWallet);
   }
 
   @Test
@@ -102,7 +105,7 @@ public class PrinterIntegrationTest {
   }
 
   private Credentials loadSampleWallet() throws Exception {
-    Files.write(Paths.get("testwallet"), configuration.walletSource.getBytes());
+    Files.write(testWallet, configuration.walletSource.getBytes());
     return WalletUtils.loadCredentials("axel", new File("testwallet"));
   }
 
