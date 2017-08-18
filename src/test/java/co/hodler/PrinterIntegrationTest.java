@@ -35,11 +35,15 @@ import static org.hamcrest.core.Is.is;
 public class PrinterIntegrationTest {
   private static String BLOCKCHAIN_URL = "http://localhost:8545";
   private static Credentials credentials;
-  private static Printer printer;
   private static Process testRpcProcess;
+  private static String contractAddress;
 
   @Autowired
   EthereumService ethereumService;
+  @Autowired
+  Configuration configuration;
+  @Autowired
+  PrinterContract contract;
 
   DefaultPrinterService printerService;
   private static PrintableId printableId;
@@ -52,14 +56,18 @@ public class PrinterIntegrationTest {
 
     send100EtherToWeb3CreatedAccount(credentials, extractFirstAccount());
 
-    DeployPrinter deployPrinter = new DeployPrinter(new DefaultEthereumService());
-    printer = deployPrinter.deployWith(credentials);
+    DeployPrinter deployPrinter = new DeployPrinter(new
+      DefaultEthereumService());
+    contractAddress = deployPrinter.deployWith(credentials)
+      .getContractAddress();
     printableId = new PrintableId("some-gcode");
   }
 
   @Before
   public void initialize() throws Exception {
-    printerService = new DefaultPrinterService(printer, ethereumService);
+    configuration.contractAddress = contractAddress;
+    printerService = new DefaultPrinterService(contract.get(credentials),
+      ethereumService);
   }
 
   @AfterClass
@@ -69,9 +77,13 @@ public class PrinterIntegrationTest {
 
   @Test
   public void is_able_to_buy_a_print_job() throws Exception {
-    Bytes32 firstDeliverableHash = ethereumService.keccak256(printableId.asString());
+    Bytes32 firstDeliverableHash = ethereumService.keccak256(printableId
+      .asString());
 
-    printer.buyRightToPrintOnce(firstDeliverableHash, BigInteger.valueOf(10000))
+    contract.get(credentials).buyRightToPrintOnce(firstDeliverableHash,
+      BigInteger
+      .valueOf
+        (10000))
       .get();
 
     UserId userId = new UserId(credentials.getAddress());
@@ -129,6 +141,5 @@ public class PrinterIntegrationTest {
       ("result").toString());
     return (String) ethAccounts.getArray().get(0);
   }
-
 
 }
