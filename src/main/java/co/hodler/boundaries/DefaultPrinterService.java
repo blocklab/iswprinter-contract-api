@@ -25,4 +25,14 @@ public class DefaultPrinterService {
       throw new RuntimeException(e);
     }
   }
+
+  public void resetPrints(PrintableId printableId, UserId userId) {
+    try {
+      printer.resetPrints(new Bytes32(printableId.asByteArray()), new Address
+        (userId.asString()))
+        .get();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

@@ -13,7 +13,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -73,20 +72,20 @@ public class PrinterIntegrationTest {
     printer.buyRightToPrintOnce(firstDeliverableHash, BigInteger.valueOf(10000))
       .get();
 
+    UserId userId = new UserId(credentials.getAddress());
     BigInteger result = printerService.checkAmountAllowedToPrint(printableId,
-      new UserId(credentials.getAddress()));
+      userId);
     assertThat(result, is(BigInteger.valueOf(1)));
   }
 
   @Test
   public void is_able_to_reset_print_amount() throws Exception {
-    Bytes32 firstDeliverableHash = new Bytes32(printableId.asByteArray());
-    Address usersAddress = new Address(credentials.getAddress());
+    UserId userId = new UserId(credentials.getAddress());
 
-    printer.resetPrints(firstDeliverableHash, usersAddress).get();
+    printerService.resetPrints(printableId, userId);
 
     BigInteger result = printerService.checkAmountAllowedToPrint(printableId,
-      new UserId(credentials.getAddress()));
+      userId);
     assertThat(result, is(BigInteger.valueOf(0)));
   }
 
