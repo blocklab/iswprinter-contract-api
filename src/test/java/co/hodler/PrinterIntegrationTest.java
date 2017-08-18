@@ -1,13 +1,16 @@
 package co.hodler;
 
+import co.hodler.boundaries.DefaultPrinterService;
 import co.hodler.boundaries.DeployPrinter;
 import co.hodler.boundaries.Printer;
 import co.hodler.model.PrintableId;
+import co.hodler.model.UserId;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.web3j.abi.datatypes.Address;
@@ -35,6 +38,9 @@ public class PrinterIntegrationTest {
   private static Printer printer;
   private static Process testRpcProcess;
 
+  DefaultPrinterService printerService;
+  private static PrintableId printableId;
+
   @BeforeClass
   public static void initialize_contract() throws Exception {
     testRpcProcess = new ProcessBuilder("testrpc").start();
@@ -46,6 +52,13 @@ public class PrinterIntegrationTest {
     web3 = Web3j.build(new HttpService());
     DeployPrinter deployPrinter = new DeployPrinter(web3);
     printer = deployPrinter.deployWith(credentials);
+    printableId = new PrintableId(web3.web3Sha3
+      ("some-gcode").send().getResult());
+  }
+
+  @Before
+  public void initialize() throws Exception {
+    printerService = new DefaultPrinterService(printer);
   }
 
   @AfterClass
@@ -55,38 +68,41 @@ public class PrinterIntegrationTest {
 
   @Test
   public void is_able_to_buy_a_print_job() throws Exception {
-    Bytes32 firstDeliverableHash = new Bytes32(new PrintableId(web3.web3Sha3
-      ("some-gcode").send().getResult()).asByteArray());
-    Address usersAddress = new Address(credentials.getAddress());
+    Bytes32 firstDeliverableHash = new Bytes32(printableId.asByteArray());
 
     printer.buyRightToPrintOnce(firstDeliverableHash, BigInteger.valueOf(10000))
       .get();
 
-    BigInteger result = printer.timesUserIsAllowedToPrint
-      (firstDeliverableHash, usersAddress).get().getValue();
+    BigInteger result = printerService.checkAmountAllowedToPrint(printableId,
+      new UserId(credentials.getAddress()));
     assertThat(result, is(BigInteger.valueOf(1)));
   }
 
   @Test
   public void is_able_to_reset_print_amount() throws Exception {
-    Bytes32 firstDeliverableHash = new Bytes32(new PrintableId(web3.web3Sha3
-      ("some-gcode").send().getResult()).asByteArray());
+    Bytes32 firstDeliverableHash = new Bytes32(printableId.asByteArray());
     Address usersAddress = new Address(credentials.getAddress());
 
     printer.resetPrints(firstDeliverableHash, usersAddress).get();
 
-    BigInteger result = printer.timesUserIsAllowedToPrint
-      (firstDeliverableHash, usersAddress).get().getValue();
+    BigInteger result = printerService.checkAmountAllowedToPrint(printableId,
+      new UserId(credentials.getAddress()));
     assertThat(result, is(BigInteger.valueOf(0)));
   }
 
-  private static Credentials generateSampleWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
+  private static Credentials generateSampleWallet() throws
+    NoSuchAlgorithmException, NoSuchProviderException,
+    InvalidAlgorithmParameterException, CipherException, IOException {
     new File("wallets").mkdir();
-    String fileName = WalletUtils.generateLightNewWalletFile("axel", new File("wallets"));
+    String fileName = WalletUtils.generateLightNewWalletFile("axel", new File
+      ("wallets"));
     return WalletUtils.loadCredentials("axel", "wallets/" + fileName);
   }
 
-  private static void send100EtherToWeb3CreatedAccount(Credentials credentials, String firstAccount) throws Exception {
+  private static void send100EtherToWeb3CreatedAccount(Credentials
+                                                         credentials, String
+                                                         firstAccount) throws
+    Exception {
     JSONObject sendTxRpcPayload = new JSONObject();
     sendTxRpcPayload.put("jsonrpc", "2.0");
     sendTxRpcPayload.put("id", 1);
@@ -106,8 +122,10 @@ public class PrinterIntegrationTest {
     ethAccountsRpcPayload.put("jsonrpc", "2.0");
     ethAccountsRpcPayload.put("method", "eth_accounts");
     ethAccountsRpcPayload.put("id", 1);
-    JsonNode responseBody = Unirest.post(BLOCKCHAIN_URL).body(ethAccountsRpcPayload).asJson().getBody();
-    JsonNode ethAccounts = new JsonNode(responseBody.getObject().get("result").toString());
+    JsonNode responseBody = Unirest.post(BLOCKCHAIN_URL).body
+      (ethAccountsRpcPayload).asJson().getBody();
+    JsonNode ethAccounts = new JsonNode(responseBody.getObject().get
+      ("result").toString());
     return (String) ethAccounts.getArray().get(0);
   }
 
