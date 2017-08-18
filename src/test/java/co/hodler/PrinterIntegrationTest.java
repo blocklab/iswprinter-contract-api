@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.web3j.abi.datatypes.generated.Bytes32;
@@ -30,7 +31,7 @@ import static org.hamcrest.core.Is.is;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:test.properties")
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PrinterIntegrationTest {
   private String BLOCKCHAIN_URL = "http://localhost:8545";
   private Credentials credentials;
@@ -45,6 +46,9 @@ public class PrinterIntegrationTest {
   Configuration configuration;
   @Autowired
   PrinterContract contract;
+  @Autowired
+  TestRestTemplate restTemplate;
+
 
   DefaultPrinterService printerService;
   private PrintableId printableId;
@@ -91,6 +95,13 @@ public class PrinterIntegrationTest {
     BigInteger result = printerService.checkAmountAllowedToPrint(printableId,
       userId);
     assertThat(result, is(BigInteger.valueOf(1)));
+  }
+
+  @Test
+  public void exampleTest() {
+    Integer response = this.restTemplate.getForObject
+      ("/printables/printableId/userId", Integer.class);
+    assertThat(response, is(1));
   }
 
   @Test
