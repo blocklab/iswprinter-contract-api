@@ -28,7 +28,6 @@ public class PrintablesController {
   @ResponseBody
   Integer getPrintablesForUser(@PathVariable("printableId") String printableId,
                                @PathVariable("userId") String userId) {
-    System.out.println(configuration.name);
     return contractService.amountAllowedToPrint(printableId, userId);
   }
 
