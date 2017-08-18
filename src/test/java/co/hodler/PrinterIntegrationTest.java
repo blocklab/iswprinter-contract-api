@@ -47,7 +47,6 @@ public class PrinterIntegrationTest {
   @Autowired
   CredentialsService credentialsService;
 
-
   DefaultPrinterService printerService;
   private PrintableId printableId;
 
@@ -66,7 +65,7 @@ public class PrinterIntegrationTest {
         .getContractAddress();
       printableId = new PrintableId("some-gcode");
       configuration.contractAddress = contractAddress;
-      printerService = new DefaultPrinterService(contract.get(credentials),
+      printerService = new DefaultPrinterService(contract.get(),
         ethereumService);
       initialized = true;
     }
@@ -83,7 +82,7 @@ public class PrinterIntegrationTest {
     Bytes32 firstDeliverableHash = ethereumService.keccak256(printableId
       .asString());
 
-    contract.get(credentials).buyRightToPrintOnce(firstDeliverableHash,
+    contract.get().buyRightToPrintOnce(firstDeliverableHash,
       BigInteger
         .valueOf
           (10000))
