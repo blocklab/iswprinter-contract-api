@@ -21,11 +21,14 @@ public class PrintablesController {
 
   @Autowired
   ContractService contractService;
+  @Autowired
+  Configuration configuration;
 
   @RequestMapping(value = "/printables/{printableId}/{userId}", method = GET)
   @ResponseBody
   Integer getPrintablesForUser(@PathVariable("printableId") String printableId,
                                @PathVariable("userId") String userId) {
+    System.out.println(configuration.name);
     return contractService.amountAllowedToPrint(printableId, userId);
   }
 

@@ -2,4 +2,5 @@
 
 set -euo pipefail
 
-java -jar target/3dprintman-0.1.0.jar
+NAME="foo"
+SPRING_APPLICATION_JSON='{"name":"'$NAME'"}' java -jar target/3dprintman-0.1.0.jar

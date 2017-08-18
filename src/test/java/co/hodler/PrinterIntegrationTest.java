@@ -36,7 +36,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(properties = {"name=foo"}, webEnvironment =
+  SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PrinterIntegrationTest {
   private static String BLOCKCHAIN_URL = "http://localhost:8545";
   private static Credentials credentials;
