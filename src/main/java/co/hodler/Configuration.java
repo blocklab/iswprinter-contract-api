@@ -5,6 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Configuration {
-  @Value("${name}")
-  public String name;
+  @Value("${contractAddress}")
+  public String contractAddress;
 }

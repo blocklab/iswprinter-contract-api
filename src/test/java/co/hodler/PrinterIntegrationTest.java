@@ -19,8 +19,6 @@ import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.http.HttpService;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,11 +31,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = {"name=foo"})
+@SpringBootTest(properties = {"contractAddress=foo"})
 public class PrinterIntegrationTest {
   private static String BLOCKCHAIN_URL = "http://localhost:8545";
   private static Credentials credentials;
-  private static Web3j web3;
   private static Printer printer;
   private static Process testRpcProcess;
 
@@ -55,7 +52,6 @@ public class PrinterIntegrationTest {
 
     send100EtherToWeb3CreatedAccount(credentials, extractFirstAccount());
 
-    web3 = Web3j.build(new HttpService());
     DeployPrinter deployPrinter = new DeployPrinter(new DefaultEthereumService());
     printer = deployPrinter.deployWith(credentials);
     printableId = new PrintableId("some-gcode");

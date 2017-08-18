@@ -10,7 +10,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = {"name=foo"}, webEnvironment = SpringBootTest
+@SpringBootTest(properties = {"contractAddress=foo"}, webEnvironment =
+  SpringBootTest
   .WebEnvironment.RANDOM_PORT)
 public class PrintablesControllerTest {
 
