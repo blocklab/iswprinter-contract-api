@@ -32,7 +32,6 @@ import static org.hamcrest.core.Is.is;
 public class PrinterIntegrationTest {
   private String BLOCKCHAIN_URL = "http://localhost:8545";
   private Credentials credentials;
-  private static Process testRpcProcess;
   private String contractAddress;
   private boolean initialized = false;
 
@@ -52,7 +51,7 @@ public class PrinterIntegrationTest {
   @Before
   public void initialize_contract() throws Exception {
     if (!initialized) {
-      testRpcProcess = new ProcessBuilder("testrpc").start();
+      new ProcessBuilder("testrpc").start();
       Thread.sleep(2000);
       credentials = credentialsService.loadCredentials();
 
@@ -70,7 +69,6 @@ public class PrinterIntegrationTest {
 
   @AfterClass
   public static void kill_testrpc() throws Exception {
-    testRpcProcess.destroy();
     Files.delete(Paths.get("wallet.tmp"));
   }
 
@@ -79,16 +77,10 @@ public class PrinterIntegrationTest {
     Bytes32 firstDeliverableHash = ethereumService.keccak256(printableId
       .asString());
 
-    contract.get().buyRightToPrintOnce(firstDeliverableHash,
-      BigInteger
-        .valueOf
-          (10000))
-      .get();
+    buyRightToPrint(firstDeliverableHash);
 
     UserId userId = new UserId(credentials.getAddress());
-    Integer response = this.restTemplate.getForObject
-      (String.format("/printables/%s/%s", printableId.asString(), userId.asString()),
-        Integer.class);
+    Integer response = printableAmount(userId, printableId);
     assertThat(response, is(1));
   }
 
@@ -99,19 +91,33 @@ public class PrinterIntegrationTest {
       ("another gcodehash");
     Bytes32 printableHash = ethereumService.keccak256(secondPrintableHash
       .asString());
+    buyRightToPrint(printableHash);
+
+    resetPrintables(userId, secondPrintableHash);
+
+    Integer response = printableAmount(userId, secondPrintableHash);
+    assertThat(response, is(0));
+  }
+
+  private void buyRightToPrint(Bytes32 printableHash) throws
+    InterruptedException, java.util.concurrent.ExecutionException {
     contract.get().buyRightToPrintOnce(printableHash,
       BigInteger
         .valueOf
           (10000))
       .get();
+  }
 
-    this.restTemplate.delete(String.format("/printables/%s/%s", secondPrintableHash
-        .asString(), userId.asString()));
-
-    Integer response = this.restTemplate.getForObject
+  private Integer printableAmount(UserId userId, PrintableId
+    secondPrintableHash) {
+    return this.restTemplate.getForObject
       (String.format("/printables/%s/%s", secondPrintableHash.asString(), userId.asString()),
         Integer.class);
-    assertThat(response, is(0));
+  }
+
+  private void resetPrintables(UserId userId, PrintableId secondPrintableHash) {
+    this.restTemplate.delete(String.format("/printables/%s/%s", secondPrintableHash
+        .asString(), userId.asString()));
   }
 
   private void send100EtherToWeb3CreatedAccount(Credentials
