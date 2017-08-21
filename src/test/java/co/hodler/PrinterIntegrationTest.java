@@ -46,8 +46,9 @@ public class PrinterIntegrationTest {
   TestRestTemplate restTemplate;
   @Autowired
   CredentialsService credentialsService;
-
+  @Autowired
   DefaultPrinterService printerService;
+
   private PrintableId printableId;
 
   @Before
@@ -65,8 +66,6 @@ public class PrinterIntegrationTest {
         .getContractAddress();
       printableId = new PrintableId("some-gcode");
       configuration.contractAddress = contractAddress;
-      printerService = new DefaultPrinterService(contract.get(),
-        ethereumService);
       initialized = true;
     }
   }
