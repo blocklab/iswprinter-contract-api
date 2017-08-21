@@ -46,8 +46,6 @@ public class PrinterIntegrationTest {
   TestRestTemplate restTemplate;
   @Autowired
   CredentialsService credentialsService;
-  @Autowired
-  DefaultPrinterService printerService;
 
   private PrintableId printableId;
 
@@ -97,11 +95,21 @@ public class PrinterIntegrationTest {
   @Test
   public void is_able_to_reset_print_amount() throws Exception {
     UserId userId = new UserId(credentials.getAddress());
+    PrintableId secondPrintableHash = new PrintableId
+      ("another gcodehash");
+    Bytes32 printableHash = ethereumService.keccak256(secondPrintableHash
+      .asString());
+    contract.get().buyRightToPrintOnce(printableHash,
+      BigInteger
+        .valueOf
+          (10000))
+      .get();
 
-    printerService.resetPrints(printableId, userId);
+    this.restTemplate.delete(String.format("/printables/%s/%s", secondPrintableHash
+        .asString(), userId.asString()));
 
     Integer response = this.restTemplate.getForObject
-      (String.format("/printables/%s/%s", printableId.asString(), userId.asString()),
+      (String.format("/printables/%s/%s", secondPrintableHash.asString(), userId.asString()),
         Integer.class);
     assertThat(response, is(0));
   }
