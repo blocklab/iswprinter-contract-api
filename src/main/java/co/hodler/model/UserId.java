@@ -7,7 +7,8 @@ public class UserId {
   public UserId(String userId) {
     final int userIdCorrectLength = 42;
     if (userId.length() != userIdCorrectLength) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("UserId has to have exactly 42 " +
+        "characters");
     }
     this.userId = userId;
   }
