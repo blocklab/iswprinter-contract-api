@@ -89,15 +89,9 @@ public class PrinterIntegrationTest {
       .get();
 
     UserId userId = new UserId(credentials.getAddress());
-    BigInteger result = printerService.checkAmountAllowedToPrint(printableId,
-      userId);
-    assertThat(result, is(BigInteger.valueOf(1)));
-  }
-
-  @Test
-  public void exampleTest() {
     Integer response = this.restTemplate.getForObject
-      ("/printables/printableId/userId", Integer.class);
+      (String.format("/printables/%s/%s", printableId.asString(), userId.asString()),
+        Integer.class);
     assertThat(response, is(1));
   }
 
