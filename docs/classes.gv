@@ -1,0 +1,10 @@
+digraph {
+  PrinterContract -> Printer
+  EthereumService -> PrinterContract
+  Configuration -> PrinterContract
+  CredentialsService -> PrinterContract
+  PrinterContract -> PrinterService
+  EthereumService -> PrinterService
+  Configuration -> CredentialsService
+  PrinterService -> PrintablesController
+}
