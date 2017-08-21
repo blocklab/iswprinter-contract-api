@@ -100,9 +100,10 @@ public class PrinterIntegrationTest {
 
     printerService.resetPrints(printableId, userId);
 
-    BigInteger result = printerService.checkAmountAllowedToPrint(printableId,
-      userId);
-    assertThat(result, is(BigInteger.valueOf(0)));
+    Integer response = this.restTemplate.getForObject
+      (String.format("/printables/%s/%s", printableId.asString(), userId.asString()),
+        Integer.class);
+    assertThat(response, is(0));
   }
 
   private void send100EtherToWeb3CreatedAccount(Credentials
