@@ -21,8 +21,6 @@ public class PrintablesController {
 
   @Autowired
   ContractService contractService;
-  @Autowired
-  Configuration configuration;
 
   @RequestMapping(value = "/printables/{printableId}/{userId}", method = GET)
   @ResponseBody
