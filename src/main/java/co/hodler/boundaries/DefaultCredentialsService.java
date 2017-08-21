@@ -9,8 +9,6 @@ import org.web3j.crypto.WalletUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 @Service
 public class DefaultCredentialsService implements CredentialsService {
@@ -20,9 +18,8 @@ public class DefaultCredentialsService implements CredentialsService {
   @Override
   public Credentials loadCredentials() {
     try {
-      Files.write(Paths.get("wallet.tmp"), config.walletSource.getBytes());
       return WalletUtils.loadCredentials(config.walletPassword, new File
-        ("wallet.tmp"));
+        (config.walletSource));
     } catch (IOException | CipherException e) {
       throw new RuntimeException(e);
     }

@@ -7,7 +7,6 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,8 +19,6 @@ import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.crypto.Credentials;
 
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -65,11 +62,6 @@ public class PrinterIntegrationTest {
       configuration.contractAddress = contractAddress;
       initialized = true;
     }
-  }
-
-  @AfterClass
-  public static void kill_testrpc() throws Exception {
-    Files.delete(Paths.get("wallet.tmp"));
   }
 
   @Test
