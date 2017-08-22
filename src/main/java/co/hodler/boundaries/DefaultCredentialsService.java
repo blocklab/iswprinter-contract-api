@@ -7,7 +7,6 @@ import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 
-import java.io.File;
 import java.io.IOException;
 
 @Service
@@ -18,8 +17,8 @@ public class DefaultCredentialsService implements CredentialsService {
   @Override
   public Credentials loadCredentials() {
     try {
-      return WalletUtils.loadCredentials(config.walletPassword, new File
-        (config.walletSource));
+      return WalletUtils.loadCredentials(config.walletPassword, config
+        .walletSource);
     } catch (IOException | CipherException e) {
       throw new RuntimeException(e);
     }
