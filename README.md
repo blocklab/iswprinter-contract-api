@@ -12,11 +12,11 @@
 
 # Docs
 
-![Dependency Graph](docs/classes.svg)
+![Dependency Graph](docs/classes.png)
 
 # Update class structure
 
-    dot -Tsvg docs/classes.gv -o docs/classes.svg
+    dot -Tpng docs/classes.gv -o docs/classes.png
 
 # Example usage
 
